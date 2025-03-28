@@ -8,7 +8,6 @@
 
 #define TAMANHO_TABULEIRO 10
 #define TAMANHO_PECA 3
-
 // Função para inicializar o tabuleiro com água
 void inicializarTabuleiro(char tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]) {
     for (int i = 0; i < TAMANHO_TABULEIRO; i++) {
@@ -37,43 +36,55 @@ void imprimirTabuleiro(char tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]) {
     }
 }
 
-// Função para colocar uma peça no tabuleiro (horizontal ou vertical)
+// Função para colocar uma peça no tabuleiro (horizontal, vertical ou diagonal)
 int colocarPeca(char tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int linha, int coluna, int direcao) {
-    // Direção 0 = Horizontal, 1 = Vertical
+    // Direção 0 = Horizontal, 1 = Vertical, 2 = Diagonal principal, 3 = Diagonal secundária
     if (direcao == 0) { // Horizontal
-        if (coluna + TAMANHO_PECA > TAMANHO_TABULEIRO) return 0; // Não cabe no tabuleiro
+        if (coluna + TAMANHO_PECA > TAMANHO_TABULEIRO) return 0;
         for (int i = 0; i < TAMANHO_PECA; i++) {
-            if (tabuleiro[linha][coluna + i] != '0') return 0; // Posição já ocupada
+            if (tabuleiro[linha][coluna + i] != '0') return 0;
         }
         for (int i = 0; i < TAMANHO_PECA; i++) {
-            tabuleiro[linha][coluna + i] = 'X'; // Coloca a peça
+            tabuleiro[linha][coluna + i] = '3';
         }
-    } else { // Vertical
-        if (linha + TAMANHO_PECA > TAMANHO_TABULEIRO) return 0; // Não cabe no tabuleiro
+    } else if (direcao == 1) { // Vertical
+        if (linha + TAMANHO_PECA > TAMANHO_TABULEIRO) return 0;
         for (int i = 0; i < TAMANHO_PECA; i++) {
-            if (tabuleiro[linha + i][coluna] != '0') return 0; // Posição já ocupada
+            if (tabuleiro[linha + i][coluna] != '0') return 0;
         }
         for (int i = 0; i < TAMANHO_PECA; i++) {
-            tabuleiro[linha + i][coluna] = 'X'; // Coloca a peça
+            tabuleiro[linha + i][coluna] = '3';
+        }
+    } else if (direcao == 2) { // Diagonal principal (↘)
+        if (linha + TAMANHO_PECA > TAMANHO_TABULEIRO || coluna + TAMANHO_PECA > TAMANHO_TABULEIRO) return 0;
+        for (int i = 0; i < TAMANHO_PECA; i++) {
+            if (tabuleiro[linha + i][coluna + i] != '0') return 0;
+        }
+        for (int i = 0; i < TAMANHO_PECA; i++) {
+            tabuleiro[linha + i][coluna + i] = '3';
+        }
+    } else if (direcao == 3) { // Diagonal secundária (↙)
+        if (linha + TAMANHO_PECA > TAMANHO_TABULEIRO || coluna - TAMANHO_PECA < 0) return 0;
+        for (int i = 0; i < TAMANHO_PECA; i++) {
+            if (tabuleiro[linha + i][coluna - i] != '0') return 0;
+        }
+        for (int i = 0; i < TAMANHO_PECA; i++) {
+            tabuleiro[linha + i][coluna - i] = '3';
         }
     }
-    return 1; // Peça colocada com sucesso
+    return 1;
 }
 
 int main() {
     char tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
-    inicializarTabuleiro(tabuleiro);  // Inicializa o tabuleiro
+    srand(time(NULL));
+    inicializarTabuleiro(tabuleiro);
 
-    // Colocando as 2 peças de 3 casas no tabuleiro
-    // Primeira peça na linha 2, coluna 3, horizontal
-    if (!colocarPeca(tabuleiro, 4, 0, 0)) {
-        printf("Erro ao colocar a primeira peça.\n");
-    }
-
-    // Segunda peça na linha 5, coluna 6, vertical
-    if (!colocarPeca(tabuleiro, 6, 7, 1)) {
-        printf("Erro ao colocar a segunda peça.\n");
-    }
+    // Posicionando as peças
+    if (!colocarPeca(tabuleiro, 4, 0, 0)) printf("Erro ao colocar a primeira peça.\n");
+    if (!colocarPeca(tabuleiro, 6, 7, 1)) printf("Erro ao colocar a segunda peça.\n");
+    if (!colocarPeca(tabuleiro, 2, 2, 2)) printf("Erro ao colocar a terceira peça (diagonal principal).\n");
+    if (!colocarPeca(tabuleiro, 1, 8, 3)) printf("Erro ao colocar a quarta peça (diagonal secundária).\n");
 
     // Exibindo o tabuleiro
     imprimirTabuleiro(tabuleiro);
